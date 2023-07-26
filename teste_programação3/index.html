@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Vida</title>
+    <style>
+    table {
+      border-collapse: collapse;
+    }
+    td {
+      width: 30px;
+      height: 20px;
+      border: 1px solid #ccc;
+      background-color: rgb(255, 255, 255);
+    }
+    body{
+        background-color: rgb(115, 134, 240);
+    }
+  </style>
+</head>
+<body>
+      <table id="board"></table>
+
+  <button onclick="startGame()">Iniciar Jogo</button>
+  <button onclick="stopGame()">Parar Jogo</button>
+  <button onclick="clearBoard()">Limpar Tabuleiro</button>
+
+  <script>
+    // Configuração inicial
+    const numRows = 10;
+    const numCols = 10;
+    const cellSize = 20;
+    let board = createBoard(numRows, numCols);
+    let intervalId = null;
+
+    // Função para criar o tabuleiro vazio
+    function createBoard(rows, cols) {
+      const board = [];
+      for (let i = 0; i < rows; i++) {
+        const row = [];
+        for (let j = 0; j < cols; j++) {
+          row.push(0);
+        }
+        board.push(row);
+      }
+      return board;
+    }
+
+    // Função para exibir o tabuleiro na página HTML
+    function displayBoard() {
+      const boardElement = document.getElementById('board');
+      boardElement.innerHTML = '';
+      for (let i = 0; i < numRows; i++) {
+        const row = document.createElement('tr');
+        for (let j = 0; j < numCols; j++) {
+          const cell = document.createElement('td');
+          cell.style.backgroundColor = board[i][j] ? 'green' : 'white';
+          cell.addEventListener('click', () => toggleCell(i, j));
+          row.appendChild(cell);
+        }
+        boardElement.appendChild(row);
+      }
+    }
+
+    // Função para alternar o estado de uma célula ao ser clicada
+    function toggleCell(row, col) {
+      board[row][col] = board[row][col] ? 0 : 1;
+      displayBoard();
+    }
+
+    // Função para iniciar o jogo
+    function startGame() {
+      intervalId = setInterval(updateBoard, 500);
+    }
+
+    // Função para parar o jogo
+    function stopGame() {
+      clearInterval(intervalId);
+    }
+
+    // Função para limpar o tabuleiro
+    function clearBoard() {
+      board = createBoard(numRows, numCols);
+      displayBoard();
+    }
+
+    // Função para atualizar o tabuleiro a cada geração
+    function updateBoard() {
+      const newBoard = createBoard(numRows, numCols);
+      for (let i = 0; i < numRows; i++) {
+        for (let j = 0; j < numCols; j++) {
+          const numNeighbors = countNeighbors(i, j);
+          if (board[i][j] === 1) {
+            if (numNeighbors === 2 || numNeighbors === 3) {
+              newBoard[i][j] = 1;
+            }
+          } else {
+            if (numNeighbors === 3) {
+              newBoard[i][j] = 1;
+            }
+          }
+        }
+      }
+      board = newBoard;
+      displayBoard();
+    }
+
+    // Função para contar o número de vizinhos vivos de uma célula
+    function countNeighbors(row, col) {
+      let count = 0;
+      for (let i = -1; i <= 1; i++) {
+        for (let j = -1; j <= 1; j++) {
+          if (i === 0 && j === 0) continue;
+          const newRow = row + i;
+          const newCol = col + j;
+          if (newRow >= 0 && newRow < numRows && newCol >= 0 && newCol < numCols) {
+            count += board[newRow][newCol];
+          }
+        }
+      }
+      return count;
+    }
+
+    // Exibir o tabuleiro inicial
+    displayBoard();
+  </script>
+</body>
+</html>
